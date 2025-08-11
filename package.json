@@ -1,0 +1,37 @@
+{
+    "name": "ojslist",
+    "version": "1.0.0",
+    "description": "算法竞赛平台信息聚合网站",
+    "main": "index.html",
+    "scripts": {
+        "start": "node build.js dev",
+        "build": "node build.js build",
+        "clean": "node build.js clean",
+        "dev": "node build.js dev"
+    },
+    "keywords": [
+        "algorithm",
+        "competition",
+        "leetcode",
+        "codeforces",
+        "atcoder",
+        "niuke",
+        "contest",
+        "oj",
+        "frontend"
+    ],
+    "author": "AlightSoulmate",
+    "license": "MIT",
+    "devDependencies": {},
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yourusername/ojslist.git"
+    },
+    "bugs": {
+        "url": "https://github.com/yourusername/ojslist/issues"
+    },
+    "homepage": "https://github.com/yourusername/ojslist#readme",
+    "engines": {
+        "node": ">=16.0.0"
+    }
+}
