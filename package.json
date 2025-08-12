@@ -1,6 +1,6 @@
 {
     "name": "clisthub",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "description": "算法竞赛平台信息聚合网站",
     "main": "index.html",
     "scripts": {
