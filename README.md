@@ -2,8 +2,15 @@
   <img src="assets/favicon.svg" alt="CListHub Logo" width="200" height="200"/>
   <br>
   <em>🎯 CListHub · 算法竞赛信息聚合网站</em>
+  <br>
 </div>
-
+<br>
+<p align="center">
+  <a href="https://clisthub.com">
+    <img src="https://img.shields.io/badge/🌐_Website-4A90E2?style=for-the-badge" alt="Website"/>
+  </a>
+</p>
+  
 ## 功能
 
 - **多平台聚合**: LeetCode、Codeforces、AtCoder、牛客等
