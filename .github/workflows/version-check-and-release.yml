@@ -90,21 +90,8 @@ jobs:
               return;
             }
 
-            // 创建新的release分支
-            const { data: ref } = await github.rest.git.getRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'heads/' + context.ref.replace('refs/heads/', '')
-            });
-
-            await github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'refs/heads/release-v${{ needs.check-version-change.outputs.new-version }}',
-              sha: ref.object.sha
-            });
-
-            // 创建PR
+            // 创建PR，直接使用当前分支作为head，master作为base
+            // 这样可以确保有实际的更改
             const prBody = `
             ## 🚀 Release v${{ needs.check-version-change.outputs.new-version }}
 
@@ -124,15 +111,26 @@ jobs:
             *This PR was automatically created by the Version Bot* 🤖
             `;
 
-            await github.rest.pulls.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `Release v${{ needs.check-version-change.outputs.new-version }}`,
-              head: `release-v${{ needs.check-version-change.outputs.new-version }}`,
-              base: context.ref.replace('refs/heads/', ''),
-              body: prBody,
-              draft: false
-            });
+            try {
+              await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `Release v${{ needs.check-version-change.outputs.new-version }}`,
+                head: context.ref.replace('refs/heads/', ''),
+                base: 'master',
+                body: prBody,
+                draft: false
+              });
+              console.log('Release PR created successfully');
+            } catch (error) {
+              console.log('Error creating PR:', error.message);
+              if (error.status === 422) {
+                console.log('Validation failed - this might happen if there are no differences');
+                console.log('Skipping PR creation');
+              } else {
+                throw error;
+              }
+            }
 
   auto-release:
     needs: check-version-change
