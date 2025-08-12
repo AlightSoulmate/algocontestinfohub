@@ -81,7 +81,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              head: `${context.repo.owner}:release-v${{ needs.check-version-change.outputs.new-version }}`
+              head: `${context.repo.owner}:${context.ref.replace('refs/heads/', '')}`
             });
 
             // 如果已经有相关的PR，跳过创建
@@ -91,7 +91,6 @@ jobs:
             }
 
             // 创建PR，直接使用当前分支作为head，master作为base
-            // 这样可以确保有实际的更改
             const prBody = `
             ## 🚀 Release v${{ needs.check-version-change.outputs.new-version }}
 
@@ -111,26 +110,17 @@ jobs:
             *This PR was automatically created by the Version Bot* 🤖
             `;
 
-            try {
-              await github.rest.pulls.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: `Release v${{ needs.check-version-change.outputs.new-version }}`,
-                head: context.ref.replace('refs/heads/', ''),
-                base: 'master',
-                body: prBody,
-                draft: false
-              });
-              console.log('Release PR created successfully');
-            } catch (error) {
-              console.log('Error creating PR:', error.message);
-              if (error.status === 422) {
-                console.log('Validation failed - this might happen if there are no differences');
-                console.log('Skipping PR creation');
-              } else {
-                throw error;
-              }
-            }
+            await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Release v${{ needs.check-version-change.outputs.new-version }}`,
+              head: context.ref.replace('refs/heads/', ''),
+              base: 'master',
+              body: prBody,
+              draft: false
+            });
+
+            console.log('Release PR created successfully');
 
   auto-release:
     needs: check-version-change
@@ -207,7 +197,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 title: '🚨 Major Version Release Detected',
-                body: `A major version change has been detected (v${{ needs.check-version-change.outputs.old-version }} → v${{ needs.check-version-change.outputs.new-version }}). Please review the release PR carefully.`,
+                body: `[bot] A major version change has been detected (v${{ needs.check-version-change.outputs.old-version }} → v${{ needs.check-version-change.outputs.new-version }}). Please review the release PR carefully.`,
                 labels: ['release', 'major-version']
               });
             }
