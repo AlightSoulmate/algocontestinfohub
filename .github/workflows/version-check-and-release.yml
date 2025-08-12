@@ -3,9 +3,9 @@ name: Version Check and Auto Release
 
 on:
   push:
-    branches: [master, release]
+    branches: [master]
   pull_request:
-    branches: [master, release]
+    branches: [master]
 
 jobs:
   check-version-change:
