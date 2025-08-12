@@ -73,7 +73,7 @@ jobs:
           tag_name: v${{ steps.package-version.outputs.version }}
           name: Release v${{ steps.package-version.outputs.version }}
           body: |
-            Automated release for version v${{ steps.package-version.outputs.version }}
+            [CI pipeline] Release for version v${{ steps.package-version.outputs.version }}
 
             Version updated from ${{ steps.previous-version.outputs.previous-version }} to ${{ steps.package-version.outputs.version }}
         env:

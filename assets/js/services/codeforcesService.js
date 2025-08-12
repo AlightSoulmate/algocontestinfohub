@@ -1,4 +1,4 @@
-// Codeforces 平台服务
+// Codeforces
 
 class CodeforcesService {
     constructor() {
@@ -67,7 +67,7 @@ class CodeforcesService {
         return {
             name: this.platformName,
             baseUrl: this.baseUrl,
-            enabled: true
+            enabled: this.enabled
         };
     }
 }

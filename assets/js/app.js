@@ -1,7 +1,10 @@
-// 算法竞赛平台 - 主要应用逻辑
-import contestService from './services/contestService.js';
+// 主要应用逻辑
+import ContestService from './services/contestService.js';
 import { Contest } from './models/contest.js';
 import { DateUtils } from './utils/dateUtils.js';
+
+// 创建服务实例
+const contestService = new ContestService();
 
 // 平台图标映射
 const platformIcons = {
@@ -76,7 +79,13 @@ class ContestApp {
     async loadContests() {
         try {
             isLoading = true;
+            
             const contests = await contestService.getCachedContests();
+            
+            if (!contests || contests.length === 0) {
+                this.showError('没有获取到比赛数据，请检查网络连接或稍后重试');
+                return;
+            }
             
             // 转换为 Contest 对象
             filteredContests = contests.map(contestData => new Contest(contestData));
@@ -85,6 +94,7 @@ class ContestApp {
             this.updateStats();
             
         } catch (error) {
+            console.error('加载比赛数据时发生错误:', error);
             this.showError('加载比赛数据失败: ' + error.message);
         } finally {
             isLoading = false;
@@ -201,13 +211,11 @@ class ContestApp {
         const totalElement = document.getElementById('totalContests');
         const upcomingElement = document.getElementById('upcomingContests');
         const ongoingElement = document.getElementById('ongoingContests');
-        const systemTestElement = document.getElementById('systemTestContests');
         const finishedElement = document.getElementById('finishedContests');
         
         if (totalElement) totalElement.textContent = total;
         if (upcomingElement) upcomingElement.textContent = upcoming;
         if (ongoingElement) ongoingElement.textContent = ongoing;
-        if (systemTestElement) systemTestElement.textContent = systemTest;
         if (finishedElement) finishedElement.textContent = finished;
     }
 
@@ -225,39 +233,14 @@ class ContestApp {
         }, 1000);
     }
 
-    // 显示错误信息
     showError(message) {
-        // 这里可以实现错误提示UI
         console.error(message);
     }
 
-    // 显示成功信息
     showSuccess(message) {
-        // 这里可以实现成功提示UI
         console.log(message);
     }
 }
-
-// 工具函数
-const Utils = {
-    // 防抖函数
-    debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    },
-
-    // 检查元素是否存在
-    elementExists(selector) {
-        return document.querySelector(selector) !== null;
-    }
-};
 
 // 页面加载完成后初始化应用
 document.addEventListener('DOMContentLoaded', () => {
@@ -267,5 +250,4 @@ document.addEventListener('DOMContentLoaded', () => {
 // 导出到全局作用域（如果需要）
 if (typeof window !== 'undefined') {
     window.ContestApp = ContestApp;
-    window.Utils = Utils;
 } 

@@ -1,4 +1,4 @@
-// AtCoder 平台服务
+// AtCoder
 
 class AtCoderService {
     constructor() {
@@ -65,7 +65,7 @@ class AtCoderService {
         return {
             name: this.platformName,
             baseUrl: this.baseUrl,
-            enabled: true
+            enabled: this.enabled
         };
     }
 }

@@ -34,42 +34,34 @@ const PLATFORMS = {
         description: "中国知名算法竞赛平台",
         enabled: false
     }
-    // 在这里添加更多平台
-    // newplatform: {
-    //     name: "新平台",
-    //     icon: "fas fa-star",
-    //     color: "#your-color",
-    //     url: "https://example.com",
-    //     description: "平台描述",
-    //     enabled: true
-    // }
+    // 在这里添加更多平台  
 };
 
 // 比赛状态配置
 const CONTEST_STATUS = {
     upcoming: {
-        text: "即将开始",
+        text: "Upcoming",
         color: "status-upcoming",
         icon: "fas fa-clock",
-        description: "比赛尚未开始"
+        description: "Upcoming"
     },
     ongoing: {
-        text: "进行中",
+        text: "Ongoing",
         color: "status-ongoing",
         icon: "fas fa-play",
-        description: "比赛正在进行"
+        description: "Ongoing"
     },
     system_test: {
         text: "Ended(System Test)",
         color: "status-system_test",
         icon: "fas fa-check",
-        description: "比赛已结束(系统测试阶段)"
+        description: "Ended(System Test)"
     },
     finished: {
-        text: "已结束",
+        text: "Ended",
         color: "status-finished",
         icon: "fas fa-check",
-        description: "比赛已结束"
+        description: "Ended"
     }
 };
 

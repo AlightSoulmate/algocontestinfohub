@@ -2,7 +2,6 @@
 
 /**
  * 平台构建脚本
- * 用于开发和生产环境的构建管理
  */
 
 const fs = require('fs');
@@ -26,12 +25,10 @@ const config = {
 // 颜色输出
 const colors = {
     reset: '\x1b[0m',
-    bright: '\x1b[1m',
     red: '\x1b[31m',
     green: '\x1b[32m',
     yellow: '\x1b[33m',
     blue: '\x1b[34m',
-    magenta: '\x1b[35m',
     cyan: '\x1b[36m'
 };
 
@@ -86,12 +83,10 @@ function copyDir(source, destination) {
 
 // 构建项目
 function build() {
-    log('🚀 开始构建项目...', 'cyan');
+    log('开始构建...', 'cyan');
     
-    // 创建构建目录
     createDir(config.buildDir);
     
-    // 复制主要文件
     for (const file of config.files) {
         const sourcePath = path.join(config.sourceDir, file);
         const destPath = path.join(config.buildDir, file);
@@ -103,7 +98,6 @@ function build() {
         }
     }
     
-    // 复制assets目录
     if (fileExists(config.assetsDir)) {
         const destAssetsDir = path.join(config.buildDir, 'assets');
         copyDir(config.assetsDir, destAssetsDir);
@@ -111,37 +105,33 @@ function build() {
         log(`⚠ assets目录不存在: ${config.assetsDir}`, 'yellow');
     }
     
-    log('✅ 构建完成!', 'green');
-    log(`📁 输出目录: ${config.buildDir}`, 'blue');
+    log('构建完成!', 'green');
+    log(`输出目录: ${config.buildDir}`, 'blue');
 }
 
 // 清理构建目录
 function clean() {
     if (fs.existsSync(config.buildDir)) {
         fs.rmSync(config.buildDir, { recursive: true, force: true });
-        log('🧹 清理构建目录完成', 'yellow');
+        log('清理构建目录完成', 'yellow');
     }
 }
 
-// 简单的内置HTTP服务器
+// 内置HTTP服务器
 function startSimpleServer(port = 8080) {
     const server = http.createServer((req, res) => {
         let filePath = url.parse(req.url).pathname;
         
-        // 默认页面
         if (filePath === '/') {
             filePath = '/index.html';
         }
         
-        // 构建完整文件路径
         const fullPath = path.join(process.cwd(), filePath);
         
-        // 检查文件是否存在
         if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
             const ext = path.extname(fullPath);
             let contentType = 'text/html';
             
-            // 设置正确的MIME类型
             switch (ext) {
                 case '.js':
                     contentType = 'application/javascript';
@@ -170,7 +160,6 @@ function startSimpleServer(port = 8080) {
             res.writeHead(200, { 'Content-Type': contentType });
             fs.createReadStream(fullPath).pipe(res);
         } else {
-            // 文件不存在，返回404
             res.writeHead(404, { 'Content-Type': 'text/html' });
             res.end(`
                 <html>
@@ -186,32 +175,30 @@ function startSimpleServer(port = 8080) {
     });
     
     server.listen(port, () => {
-        log(`🌐 内置服务器启动成功!`, 'green');
-        log(`📱 本地访问: http://localhost:${port}`, 'blue');
-        log(`🌍 网络访问: http://0.0.0.0:${port}`, 'blue');
-        log(`⏹️  按 Ctrl+C 停止服务器`, 'yellow');
+        log(`🌐 Server is running on http://localhost:${port}`, 'blue');
+        log(`press Ctrl+C to stop`, 'yellow');
     });
     
     server.on('error', (err) => {
         if (err.code === 'EADDRINUSE') {
-            log(`❌ 端口 ${port} 已被占用，尝试使用端口 ${port + 1}`, 'red');
+            log(`Port ${port} is already in use, trying port ${port + 1}`, 'red');
             startSimpleServer(port + 1);
         } else {
-            log(`❌ 服务器启动失败: ${err.message}`, 'red');
+            log(`Server failed to start: ${err.message}`, 'red');
         }
     });
 }
 
 // 开发模式
 function dev() {
-    log('🔧 开发模式', 'cyan');
+    log('开发模式', 'cyan');
     log('启动内置HTTP服务器...', 'blue');
     startSimpleServer();
 }
 
 // 显示帮助信息
 function showHelp() {
-    log('算法竞赛平台 - 构建脚本', 'bright');
+    log('CListHub - 构建脚本', 'cyan');
     log('');
     log('使用方法:', 'cyan');
     log('  node build.js [命令]', 'white');

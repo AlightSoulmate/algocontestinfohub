@@ -1,4 +1,4 @@
-// LeetCode 平台服务
+// LeetCode
 
 class LeetCodeService {
     constructor() {
@@ -83,7 +83,7 @@ class LeetCodeService {
         return {
             name: this.platformName,
             baseUrl: this.baseUrl,
-            enabled: true
+            enabled: this.enabled
         };
     }
 }
