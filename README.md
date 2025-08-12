@@ -44,8 +44,7 @@
 
 2. **打开网站**
 
-   - 直接双击 `index.html` 文件
-   - 或在浏览器中打开 `index.html`
+   - 直接预览 `index.html` 文件或 `npm run start` 启动
 
 3. **开始使用**
    - 浏览所有比赛信息
