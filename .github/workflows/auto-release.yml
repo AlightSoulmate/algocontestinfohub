@@ -3,7 +3,7 @@ name: Auto Release from package.json
 on:
   push:
     branches:
-      - release
+      - master
 
 permissions:
   contents: write
@@ -16,8 +16,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # 确保能获取 tags
-          token: ${{ secrets.PAT_TOKEN }} # 使用PAT token进行checkout
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Get current version from package.json
         id: package-version
@@ -25,7 +25,30 @@ jobs:
           VERSION=$(jq -r .version package.json)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
+      - name: Get previous version from git history
+        id: previous-version
+        run: |
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          if [ "$COMMIT_COUNT" -lt 2 ]; then
+            echo "previous-version=0.0.0" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          PREV_VERSION=$(git show HEAD~1:package.json 2>/dev/null | jq -r .version 2>/dev/null || echo "0.0.0")
+          echo "previous-version=$PREV_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check if version changed
+        id: version-changed
+        run: |
+          CURRENT_VERSION="${{ steps.package-version.outputs.version }}"
+          PREVIOUS_VERSION="${{ steps.previous-version.outputs.previous-version }}"
+          if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Check if tag exists
+        if: steps.version-changed.outputs.changed == 'true'
         id: check-tag
         run: |
           git fetch --tags
@@ -36,7 +59,7 @@ jobs:
           fi
 
       - name: Create tag
-        if: steps.check-tag.outputs.exists == 'false'
+        if: steps.version-changed.outputs.changed == 'true' && steps.check-tag.outputs.exists == 'false'
         run: |
           git config --global user.email "bot@clisthub.com"
           git config --global user.name "Bot"
@@ -44,12 +67,14 @@ jobs:
           git push origin "v${{ steps.package-version.outputs.version }}"
 
       - name: Create GitHub Release
-        if: steps.check-tag.outputs.exists == 'false'
+        if: steps.version-changed.outputs.changed == 'true' && steps.check-tag.outputs.exists == 'false'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.package-version.outputs.version }}
           name: Release v${{ steps.package-version.outputs.version }}
           body: |
             Automated release for version v${{ steps.package-version.outputs.version }}
+
+            Version updated from ${{ steps.previous-version.outputs.previous-version }} to ${{ steps.package-version.outputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
