@@ -15,19 +15,19 @@ jobs:
       old-version: ${{ steps.check.outputs.old-version }}
       new-version: ${{ steps.check.outputs.new-version }}
       is-major: ${{ steps.check.outputs.is-major }}
-    
+
     steps:
       - name: Checkout current branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
-      
+
       - name: Check version change
         id: check
         run: |
           # 获取当前版本
           CURRENT_VERSION=$(node -p "require('./package.json').version")
-          
+
           # 获取上一个commit的版本
           git checkout HEAD~1 -- package.json 2>/dev/null || echo "No previous version"
           if [ -f package.json ]; then
@@ -35,13 +35,13 @@ jobs:
           else
             PREVIOUS_VERSION="0.0.0"
           fi
-          
+
           # 恢复当前package.json
           git checkout HEAD -- package.json
-          
+
           echo "Previous version: $PREVIOUS_VERSION"
           echo "Current version: $CURRENT_VERSION"
-          
+
           # 检查版本是否发生变化
           if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
             echo "changed=true" >> $GITHUB_OUTPUT
@@ -65,17 +65,17 @@ jobs:
     needs: check-version-change
     if: needs.check-version-change.outputs.version-changed == 'true' && github.event_name == 'push'
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-      
+          token: ${{ secrets.PAT_TOKEN }}
+
       - name: Create Release PR
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PAT_TOKEN }}
           script: |
             const { data: pullRequests } = await github.rest.pulls.list({
               owner: context.repo.owner,
@@ -83,47 +83,47 @@ jobs:
               state: 'open',
               head: `${context.repo.owner}:release-v${{ needs.check-version-change.outputs.new-version }}`
             });
-            
+
             // 如果已经有相关的PR，跳过创建
             if (pullRequests.length > 0) {
               console.log('Release PR already exists');
               return;
             }
-            
+
             // 创建新的release分支
             const { data: ref } = await github.rest.git.getRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: 'heads/' + context.ref.replace('refs/heads/', '')
             });
-            
+
             await github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: 'refs/heads/release-v${{ needs.check-version-change.outputs.new-version }}',
               sha: ref.object.sha
             });
-            
+
             // 创建PR
             const prBody = `
             ## 🚀 Release v${{ needs.check-version-change.outputs.new-version }}
-            
+
             Version changed from \`${{ needs.check-version-change.outputs.old-version }}\` to \`${{ needs.check-version-change.outputs.new-version }}\`
-            
+
             ${{ needs.check-version-change.outputs.is-major == 'true' && '⚠️ **This is a MAJOR version change!**' || '' }}
-            
+
             ### Changes in this release:
             - Version bump in package.json
-            
+
             ### Next steps:
             1. Review the changes
             2. Merge this PR to trigger automatic release
             3. The release will be created automatically after merge
-            
+
             ---
             *This PR was automatically created by the Version Bot* 🤖
             `;
-            
+
             await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -138,53 +138,53 @@ jobs:
     needs: check-version-change
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && contains(github.event.pull_request.head.ref, 'release-v')
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
-      
+          node-version: "18"
+          cache: "npm"
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Build project (if needed)
         run: |
           if [ -f "package.json" ] && grep -q '"build"' package.json; then
             npm run build
           fi
-      
+
       - name: Run tests
         run: |
           if [ -f "package.json" ] && grep -q '"test"' package.json; then
             npm test
           fi
-      
+
       - name: Get version from package.json
         id: package-version
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-      
+
       - name: Generate changelog
         id: changelog
         run: |
           # 这里可以集成 conventional-changelog 或其他工具生成更详细的 changelog
           echo "changelog=Auto-generated release for version ${{ steps.package-version.outputs.version }}" >> $GITHUB_OUTPUT
-      
+
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           tag_name: v${{ steps.package-version.outputs.version }}
           release_name: Release v${{ steps.package-version.outputs.version }}
           body: |
             ## What's Changed
             ${{ steps.changelog.outputs.changelog }}
-            
+
             **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ needs.check-version-change.outputs.old-version }}...v${{ steps.package-version.outputs.version }}
           draft: false
           prerelease: false
@@ -193,16 +193,16 @@ jobs:
     needs: [check-version-change, create-release-pr]
     if: always() && needs.check-version-change.outputs.version-changed == 'true'
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Send notification
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PAT_TOKEN }}
           script: |
             // 可以在这里添加通知逻辑，比如发送到 Slack、邮件等
             console.log('Version change detected and PR created!');
-            
+
             // 示例：创建 issue 通知
             if ('${{ needs.check-version-change.outputs.is-major }}' === 'true') {
               await github.rest.issues.create({
