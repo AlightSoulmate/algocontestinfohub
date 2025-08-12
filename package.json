@@ -1,6 +1,6 @@
 {
-    "name": "ojslist",
-    "version": "1.0.0",
+    "name": "clisthub",
+    "version": "0.1.0",
     "description": "算法竞赛平台信息聚合网站",
     "main": "index.html",
     "scripts": {
@@ -14,10 +14,9 @@
         "leetcode",
         "codeforces",
         "atcoder",
-        "niuke",
+        "nowcoder",
         "contest",
-        "oj",
-        "frontend"
+        "oj"
     ],
     "author": "AlightSoulmate",
     "license": "MIT",
