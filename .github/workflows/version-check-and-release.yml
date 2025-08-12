@@ -3,9 +3,9 @@ name: Version Check and Auto Release
 
 on:
   push:
-    branches: [master]
+    branches: [master, release]
   pull_request:
-    branches: [master]
+    branches: [master, release]
 
 jobs:
   check-version-change:
@@ -81,7 +81,8 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              head: `${context.repo.owner}:${context.ref.replace('refs/heads/', '')}`
+              head: `${context.repo.owner}:${context.ref.replace('refs/heads/', '')}`,
+              base: 'release'
             });
 
             // 如果已经有相关的PR，跳过创建
@@ -90,7 +91,7 @@ jobs:
               return;
             }
 
-            // 创建PR，直接使用当前分支作为head，master作为base
+            // 创建PR，直接使用当前分支作为head，release作为base
             const prBody = `
             ## 🚀 Release v${{ needs.check-version-change.outputs.new-version }}
 
@@ -113,9 +114,9 @@ jobs:
             await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Release v${{ needs.check-version-change.outputs.new-version }}`,
+              title: `🚀 Release v${{ needs.check-version-change.outputs.new-version }} (${context.ref.replace('refs/heads/', '')} → release)`,
               head: context.ref.replace('refs/heads/', ''),
-              base: 'master',
+              base: 'release',
               body: prBody,
               draft: false
             });
@@ -124,7 +125,7 @@ jobs:
 
   auto-release:
     needs: check-version-change
-    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && contains(github.event.pull_request.head.ref, 'release-v')
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'release'
     runs-on: ubuntu-latest
 
     steps:
@@ -173,7 +174,7 @@ jobs:
             ## What's Changed
             ${{ steps.changelog.outputs.changelog }}
 
-            **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ needs.check-version-change.outputs.old-version }}...v${{ steps.package-version.outputs.version }}
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/release...v${{ steps.package-version.outputs.version }}
           draft: false
           prerelease: false
 
