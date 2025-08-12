@@ -5,10 +5,14 @@
   <br>
 </div>
 <br>
+
 <p align="center">
   <a href="https://clisthub.com">
     <img src="https://img.shields.io/badge/🌐_Website-4A90E2?style=for-the-badge" alt="Website"/>
   </a>
+  <img src="https://img.shields.io/badge/🚧_Under_Development-orange?style=for-the-badge" alt="Under Development"/>
+  <br>
+  
 </p>
   
 ## 功能
@@ -18,7 +22,7 @@
 - **智能搜索**: 按比赛名称和平台搜索
 - **平台筛选**: 快速筛选特定平台比赛
 
-## 📁 项目结构
+## 项目结构
 
 ```
 ojslist/
@@ -31,14 +35,14 @@ ojslist/
 └── README.md               # 项目说明（local）
 ```
 
-## 📱 支持的平台
+## 支持的平台
 
 | Platform   | logo | color |
 | ---------- | ---- | ----- |
-| LeetCode   | 💻   | 橙色  |
-| Codeforces | 🔥   | 蓝色  |
-| AtCoder    | 🤖   | 红色  |
-| NowCoder   | 🎓   | 绿色  |
+| LeetCode   | <img src="https://img.shields.io/badge/LeetCode-%F0%9F%93%8B_Planned-FFA116?style=flat&logo=leetcode&logoColor=black" alt="LeetCode"/>        | 橙色 |
+| Codeforces | <img src="https://img.shields.io/badge/Codeforces-1F8ACB?style=flat&logo=codeforces&logoColor=white" alt="Codeforces"/>  | 蓝色 | 
+| AtCoder    | <img src="https://img.shields.io/badge/AtCoder-%F0%9F%93%8B_Planned-red?style=flat&logo=atcoder&logoColor=white" alt="AtCoder"/>              | 红色 |
+| 牛客竞赛    | <img src="https://img.shields.io/badge/NowCoder-%F0%9F%93%8B_Planned-2E8B57?style=flat&logoColor=white" alt="NowCoder"/>                      | 绿色 |
 
 ## 快速开始
 
@@ -96,3 +100,25 @@ ojslist/
 
 - 本地预览：`npm start` 或 Live Server
 - 生产部署：`npm run build` 打包
+
+## 开发计划
+
+- [ ] 更多平台支持
+- [ ] 添加日历提醒功能 (.ics)
+- [ ] 多语言 / i18n
+- [ ] 比赛详细数据的展示模块
+- [ ] 用户个性化和 UGC 模块
+- [ ] API 接口开放
+- [ ] 其他
+ 
+## 贡献
+
+- 欢迎提交 Issue 和 Pull Request！完善本项目。
+
+## 相关链接
+
+- [Codeforces](https://codeforces.com) 
+- [AtCoder](https://atcoder.jp)
+- [牛客竞赛](https://ac.nowcoder.com)
+- [LeetCode 中国](https://leetcode.cn)
+- [Kenkoooo](https://kenkoooo.com/atcoder) - AtCoder Problem List
