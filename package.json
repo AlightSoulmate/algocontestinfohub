@@ -1,6 +1,6 @@
 {
     "name": "clisthub",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "description": "算法竞赛平台信息聚合网站",
     "main": "index.html",
     "scripts": {
@@ -23,12 +23,8 @@
     "devDependencies": {},
     "repository": {
         "type": "git",
-        "url": "https://github.com/yourusername/ojslist.git"
+        "url": "https://github.com/AlightSoulmate/algocontestinfohub.git"
     },
-    "bugs": {
-        "url": "https://github.com/yourusername/ojslist/issues"
-    },
-    "homepage": "https://github.com/yourusername/ojslist#readme",
     "engines": {
         "node": ">=16.0.0"
     }
